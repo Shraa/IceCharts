@@ -1,0 +1,209 @@
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: Sample Ice Chart Service
+  description: >
+    Ice map service providing data of radar space surveys for ice areas of the world.
+  termsOfService: 'https://store.maritime.earth/ru/terms/'
+  contact:
+    email: maritime@scanex.ru
+tags:
+- name: grids
+  description: Bulk operations with grids
+- name: grid
+  description: Atomic operations with grids
+- name: cells
+  description: Bulk operations with cells
+paths:
+  /grids:
+    get:
+      tags:
+        - grids
+      summary: Get a list of grids
+      description: Returns a list of available grids for cells with ice maps
+      responses:
+        200:
+          description: OK
+    post:
+      tags:
+        - grids
+      summary: Post a list of grids
+      description: Returns the result of importing a list of available grids for cells with ice maps
+      parameters:
+        - in: body
+          name: info
+          required: true
+          schema:
+             $ref: '#/definitions/grids'
+      responses:
+        200:
+          description: OK
+    delete:
+      tags:
+        - grids
+      summary: Drop all grids
+      description: Returns the status of an operation
+      responses:
+        200:
+          description: OK
+  /grid/{id}:
+    get:
+      tags:
+        - grid
+      summary: Get a grid by id
+      description: Returns a grid info
+      parameters:
+        - name: id
+          in: path
+          type: string
+          format: uuid
+          description: Grid ID in UUID4 format
+          required: true
+      responses:
+        200:
+          description: OK
+        404:
+          description: Not found
+    put:
+      tags:
+        - grid
+      summary: Add or update a grid info by grid id
+      description: Returns the result of adding or updating the grid info by gridID
+      parameters:
+        - name: id
+          in: path
+          type: string
+          format: uuid
+          description: Grid ID in UUID4 format
+          required: true
+        - name: info
+          in: body
+          description: A list of available grids whithout gridID
+          required: true
+          schema:
+            $ref: '#/definitions/grid'
+      responses:
+        200:
+          description: OK
+    delete:
+      tags:
+        - grid
+      summary: Delete a grid by grid id
+      description: Returns the result of deleting the grid
+      parameters:
+        - name: id
+          in: path
+          type: string
+          format: uuid
+          description: Grid ID in UUID4 format
+          required: true
+      responses:
+        200:
+          description: OK
+        404:
+          description: Not found
+  /cells:
+    get:
+      tags:
+        - cells
+      summary: Get a list of cells from all grids
+      description: Returns a list of available cells with ice maps from all grids
+      responses:
+        200:
+          description: OK
+    delete:
+      tags:
+        - cells
+      summary: Drop all cells
+      description: Returns the status of an operation
+      operationId: app.api.cells.delete_all
+      responses:
+        200:
+          description: OK
+  /cells/{grid_id}:
+    get:
+      tags:
+        - cells
+      summary: Get a list of cells from the grid
+      description: Returns a list of available cells with ice maps from the grid
+      parameters:
+        - in: path
+          name: grid_id
+          required: true
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: OK
+    post:
+      tags:
+        - cells
+      summary: Post a list of cells for the grids
+      description: Returns the result of importing a list of cells for the grid
+      parameters:
+        - in: path
+          name: grid_id
+          required: true
+          type: string
+          format: uuid
+        - in: body
+          name: info
+          required: true
+          schema:
+             $ref: '#/definitions/cells'
+      responses:
+        200:
+          description: OK
+    delete:
+      tags:
+        - cells
+      summary: Drop all cells from the grid
+      description: Returns the status of an operation
+      parameters:
+        - in: path
+          name: grid_id
+          required: true
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: OK
+definitions:
+  grid:
+    type: object
+    required:
+      - name
+      - description
+    properties:
+      id:
+        type: string
+        format: uuid
+      name:
+        type: string
+      description:
+        type: string
+  grids:
+    type: array
+    items:
+      $ref: '#/definitions/grid'
+  cell:
+    type: object
+    required:
+      - grid_id
+      - name
+      - description
+    properties:
+      id:
+        type: string
+        format: uuid
+      grid_id:
+        type: string
+        format: uuid
+      name:
+        type: string
+      description:
+        type: string
+  cells:
+    type: array
+    items:
+      $ref: '#/definitions/cell'

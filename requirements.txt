@@ -1,0 +1,9 @@
+multimethod
+gevent
+requests
+Flask
+connexion
+Flask-Injector
+fastavro
+elasticsearch
+elasticsearch_dsl
