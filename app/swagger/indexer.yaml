@@ -46,14 +46,14 @@ paths:
       responses:
         200:
           description: OK
-  /grid/{id}:
+  /grid/{grid_id}:
     get:
       tags:
         - grid
       summary: Get a grid by id
       description: Returns a grid info
       parameters:
-        - name: id
+        - name: grid_id
           in: path
           type: string
           format: uuid
@@ -70,7 +70,7 @@ paths:
       summary: Add or update a grid info by grid id
       description: Returns the result of adding or updating the grid info by gridID
       parameters:
-        - name: id
+        - name: grid_id
           in: path
           type: string
           format: uuid
@@ -91,7 +91,7 @@ paths:
       summary: Delete a grid by grid id
       description: Returns the result of deleting the grid
       parameters:
-        - name: id
+        - name: grid_id
           in: path
           type: string
           format: uuid

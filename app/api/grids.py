@@ -6,7 +6,23 @@ from app.models.grids import Grids
 storage = Grids()
 
 
+def search() -> dict:
+    """
+    Summary: Get a list of grids
+    Description: Returns a list of available grids for cells with ice maps
+
+    """
+    # NOTE: we need to wrap it with list for Python 3 as dict_values is not JSON serializable
+    storage.check_index()
+    return storage.get_all(), 200
+
+
 def post(info: dict) -> dict:
+    """
+    Summary: Post a list of grids
+    Description: Returns the result of importing a list of available grids for cells with ice maps
+
+    """
     for grid in info:
         if 'id' not in grid:
             grid['id'] = str(uuid.uuid4())
@@ -20,11 +36,10 @@ def post(info: dict) -> dict:
 
 
 def delete() -> dict:
+    """
+    Summary: Drop all grids
+    Description: Returns the status of an operation
+
+    """
     storage.check_index()
     return storage.delete_index(), 200
-
-
-def search() -> dict:
-    # NOTE: we need to wrap it with list for Python 3 as dict_values is not JSON serializable
-    storage.check_index()
-    return storage.get_all(), 200

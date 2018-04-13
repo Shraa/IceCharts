@@ -28,13 +28,12 @@ class TestGridService(unittest.TestCase):
             self.assertEqual(ret.json(), str('Not found'))
             self.assertEqual(ret.status_code, 404)
 
-    def test_put_grids(self):
+    def test_put_updated_grids(self):
         do_init_grids('{0}/{1}'.format(self.url, str('grids')))
-        requests = copy.deepcopy(GRIDS)
         good_responses = copy.deepcopy(GRIDS)
         for good_response in good_responses:
             good_response['status'] = 'updated'
-        for request in requests:
+        for request in GRIDS:
             good_response = do_search('id', request['id'], good_responses)
             ret = do_put('{0}/{1}/{2}'.format(self.url, self.service, request['id']), json.dumps(request))
             self.assertEqual(ret.json(), good_response)
@@ -83,29 +82,29 @@ class TestGridService(unittest.TestCase):
             self.assertEqual(ret.status_code, 200)
 
     def test_put_grids_id_not_match(self):
-        # TODO: Break the testcase into subtests
         do_init_grids('{0}/{1}'.format(self.url, str('grids')))
-        requests = copy.deepcopy(GRIDS)
-        good_responses = copy.deepcopy(requests)
-        for good_response in good_responses:
-            good_response['status'] = "the parameters id and doc['id'] do not match"
-        for request in requests:
-            good_response = do_search('id', request['id'], good_responses)
-            ret = do_put('{0}/{1}/{2}'.format(self.url, self.service, str(uuid.uuid4())), json.dumps(request))
-            self.assertEqual(ret.json(), good_response)
-            self.assertEqual(ret.status_code, 400)
-        requests = copy.deepcopy(GRIDS)
-        for request in requests:
-            request['id'] = str(uuid.uuid4())
-        good_responses = copy.deepcopy(requests)
-        for good_response in good_responses:
-            good_response['status'] = "the parameters id and doc['id'] do not match"
-        for request in requests:
-            grid = do_search('name', request['name'], GRIDS)
-            good_response = do_search('id', request['id'], good_responses)
-            ret = do_put('{0}/{1}/{2}'.format(self.url, self.service, grid['id']), json.dumps(request))
-            self.assertEqual(ret.json(), good_response)
-            self.assertEqual(ret.status_code, 400)
+        with self.subTest('Wrong id was set in the request path'):
+            good_responses = copy.deepcopy(GRIDS)
+            for good_response in good_responses:
+                good_response['status'] = "the parameters id and doc['id'] do not match"
+            for request in GRIDS:
+                good_response = do_search('id', request['id'], good_responses)
+                ret = do_put('{0}/{1}/{2}'.format(self.url, self.service, str(uuid.uuid4())), json.dumps(request))
+                self.assertEqual(ret.json(), good_response)
+                self.assertEqual(ret.status_code, 400)
+        with self.subTest('Wrong id was set in the request body'):
+            requests = copy.deepcopy(GRIDS)
+            for request in requests:
+                request['id'] = str(uuid.uuid4())
+            good_responses = copy.deepcopy(requests)
+            for good_response in good_responses:
+                good_response['status'] = "the parameters id and doc['id'] do not match"
+            for request in requests:
+                grid = do_search('name', request['name'], GRIDS)
+                good_response = do_search('id', request['id'], good_responses)
+                ret = do_put('{0}/{1}/{2}'.format(self.url, self.service, grid['id']), json.dumps(request))
+                self.assertEqual(ret.json(), good_response)
+                self.assertEqual(ret.status_code, 400)
 
     def test_delete_grids(self):
         do_init_grids('{0}/{1}'.format(self.url, str('grids')))

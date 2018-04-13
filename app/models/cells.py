@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import requests
 from app.models import ElasticSearch
 from app.models.mappers import cell_mapper
 
@@ -12,18 +13,21 @@ class Cells(ElasticSearch):
         self.doc_type = 'cell'
         self.index_mapper = cell_mapper
         self.instance = self.connect()
+        self.grid_url = 'http://localhost:5000/grid'
 
-    def get(self, grid_id: str, **kwargs) -> dict:
-        # if id in kwargs:
-        #     return self.fetch_by_params({'grid_id': grid_id, 'id': kwargs[id]})
-        return self.fetch_by_param(key='grid_id', value=grid_id)
-
-    def get_all(self, grid_id=None) -> dict:
-        self.check_index()
-        if grid_id:
-            return self.fetch_by_param(key='grid_id', value=grid_id)
+    def get(self, **kwargs) -> dict:
+        grid_id = kwargs.pop('grid_id', None)
+        cell_id = kwargs.pop('cell_id', None)
+        if cell_id and grid_id:
+            return self.fetch_by_params(grid_id=grid_id, id=cell_id)
+        elif grid_id:
+            return self.fetch_by_params(grid_id=grid_id)
+            # return self.fetch_by_param(key='grid_id', value=grid_id)
         else:
             return self.fetch_all()
+
+    def get_grid(self, grid_id: str):
+        return requests.get(url='{}/{}'.format(self.grid_url, grid_id))
 
     def put(self, id: str, doc: dict):
         self.check_index()
@@ -57,7 +61,7 @@ class Cells(ElasticSearch):
 
     def exists_by_name(self, grid_id: str, name: str) -> bool:
         self.check_index()
-        cell = self.fetch_by_params({'grid_id': grid_id, 'name': name})
+        cell = self.fetch_by_params(grid_id=grid_id, name=name)
         if cell:
             return True
         return False
@@ -77,18 +81,17 @@ class Cells(ElasticSearch):
                 }
             }
         )
-
+        result = []
         for match in matches:
             if match[key] == value:
-                return match
-        else:
-            return []
+                result.append(match)
+        return result
 
-    def fetch_by_params(self, params: dict) -> dict:
+    def fetch_by_params(self, **kwargs) -> dict:
         self.check_index()
-        filter = []
-        for key, value in params.items():
-            filter.append(
+        query_string = []
+        for key, value in kwargs.items():
+            query_string.append(
                 {
                     'match': {
                         key: {
@@ -102,13 +105,13 @@ class Cells(ElasticSearch):
             {
                 'query': {
                     'bool': {
-                        'should': filter
+                        'should': query_string
                     }
                 }
             }
         )
+        result = []
         for match in matches:
-            if all(item in match.items() for item in params.items()):
-                return match
-            else:
-                return []
+            if all(item in match.items() for item in kwargs.items()):
+                result.append(match)
+        return result

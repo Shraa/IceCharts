@@ -22,8 +22,7 @@ def get_greeting():
 
 
 def main():
-    # app = connexion.App(__name__, server='gevent', specification_dir='swagger/')
-    app = connexion.App(__name__, specification_dir='swagger/')
+    app = connexion.App(__name__, server='gevent', specification_dir='swagger/')
     app.add_api('indexer.yaml', resolver=RestyResolver('app.api'), arguments={'title': 'Sample Ice Chart Service'})
     FlaskInjector(app=app.app)
     app.run(port=5000)
