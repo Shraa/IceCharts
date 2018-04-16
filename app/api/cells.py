@@ -45,12 +45,8 @@ def post(**kwargs):
     for cell in info:
         if 'id' not in cell:
             cell['id'] = str(uuid.uuid4())
-        if 'grid_id' not in cell:
-            cell['grid_id'] = grid_id
-        if grid.status_code == 404:
-            cell['status'] = 'Grids not found'
         elif grid_id != cell['grid_id']:
-            cell['status'] = 'Grids not match'
+            cell['status'] = 'Grid not match'
         elif storage.exists_by_id(cell['id']):
             cell['status'] = 'Cell with this id already in index'
         elif storage.exists_by_name(grid_id, cell['name']):
@@ -83,5 +79,6 @@ def delete(**kwargs):
     else:
         cells = storage.get(grid_id=grid_id)
         for cell in cells:
-            cell['status'] = storage.delete(cell['id'])
+            status = storage.delete(cell['id'])
+            cell['status'] = status.pop('result')
         return cells
