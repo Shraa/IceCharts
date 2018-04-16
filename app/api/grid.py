@@ -6,7 +6,7 @@ from app.models.grids import Grids
 storage = Grids()
 
 
-def get(** kwargs):
+def get(**kwargs):
     """
     Summary: Get a grid by id
     Description: Returns a grid info
