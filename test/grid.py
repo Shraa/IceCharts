@@ -74,12 +74,12 @@ class TestGridService(unittest.TestCase):
             request['id'] = str(uuid.uuid4())
         good_responses = copy.deepcopy(requests)
         for good_response in good_responses:
-            good_response['status'] = 'updated'
+            good_response['status'] = 'the parameters id can not be changed'
         for request in requests:
             good_response = do_search('id', request['id'], good_responses)
             ret = do_put('{0}/{1}/{2}'.format(self.url, self.service, request['id']), json.dumps(request))
             self.assertEqual(ret.json(), good_response)
-            self.assertEqual(ret.status_code, 200)
+            self.assertEqual(ret.status_code, 400)
 
     def test_put_grids_id_not_match(self):
         do_init_grids('{0}/{1}'.format(self.url, str('grids')))

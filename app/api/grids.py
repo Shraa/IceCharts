@@ -17,12 +17,13 @@ def search() -> dict:
     return storage.get_all(), 200
 
 
-def post(info: dict) -> dict:
+def post(**kwargs) -> dict:
     """
     Summary: Post a list of grids
     Description: Returns the result of importing a list of available grids for cells with ice maps
 
     """
+    info = kwargs.pop('info')
     for grid in info:
         if 'id' not in grid:
             grid['id'] = str(uuid.uuid4())
